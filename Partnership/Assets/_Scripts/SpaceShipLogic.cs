@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class SpaceShipeLogic : MonoBehaviour
+public class SpaceShipLogic : MonoBehaviour
 {
     public float forceMultiplier;
     public float breakTime;

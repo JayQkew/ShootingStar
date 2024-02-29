@@ -30,7 +30,7 @@ public class BoidsManager : MonoBehaviour
     {
         foreach (var boid in boids)
         {
-            boid.GetComponent<SpaceShipeLogic>().areaOfInfluence = areaOfInfluence;
+            boid.GetComponent<SpaceShipLogic>().areaOfInfluence = areaOfInfluence;
 
             Coherence(boid);
             Separation(boid);
@@ -43,16 +43,16 @@ public class BoidsManager : MonoBehaviour
         // calculate the center of mass
         Vector3 totalMass = Vector3.zero;
 
-        if (boid.GetComponent<SpaceShipeLogic>().surroundingShips.Length > 0)
+        if (boid.GetComponent<SpaceShipLogic>().surroundingShips.Length > 0)
         {
-            foreach (GameObject b in boid.GetComponent<SpaceShipeLogic>().surroundingShips)
+            foreach (GameObject b in boid.GetComponent<SpaceShipLogic>().surroundingShips)
             {
                 totalMass += b.transform.position;
             }
         }
         else return;
 
-        Vector2 centerOfMass = totalMass / (boid.GetComponent<SpaceShipeLogic>().surroundingShips.Length - 1);
+        Vector2 centerOfMass = totalMass / (boid.GetComponent<SpaceShipLogic>().surroundingShips.Length - 1);
 
         Vector2 centerOfMassForce = centerOfMass - (Vector2)boid.transform.position;
 
@@ -68,9 +68,9 @@ public class BoidsManager : MonoBehaviour
     {
         Vector2 center = Vector2.zero;
 
-        if (boid.GetComponent<SpaceShipeLogic>().surroundingShips.Length > 0)
+        if (boid.GetComponent<SpaceShipLogic>().surroundingShips.Length > 0)
         {
-            foreach (GameObject b in boid.GetComponent<SpaceShipeLogic>().surroundingShips)
+            foreach (GameObject b in boid.GetComponent<SpaceShipLogic>().surroundingShips)
             {
                 if (Vector3.Magnitude(b.transform.position - boid.transform.position) < 10)
                 {
