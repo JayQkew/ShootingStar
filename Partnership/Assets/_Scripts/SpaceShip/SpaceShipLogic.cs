@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class SpaceShipLogic : MonoBehaviour
 {
+    public bool active;
     public float forceMultiplier;
     public float breakTime;
     public Rigidbody2D rb;
@@ -17,10 +17,17 @@ public class SpaceShipLogic : MonoBehaviour
 
     void Update()
     {
-        speed = Vector3.Magnitude(rb.velocity);
+        if (active == true)
+        {
+            speed = Vector3.Magnitude(rb.velocity);
 
-        MovementControl();
-        SurroudingShips();
+            MovementControl();
+            SurroudingShips();
+        }
+        else if (active == false) 
+        {
+            ShipScanner();
+        }
     }
 
     public void MovementControl()
@@ -57,4 +64,26 @@ public class SpaceShipLogic : MonoBehaviour
 
     }
 
+    public void ShipScanner()
+    {
+        RaycastHit2D[] hit = Physics2D.CircleCastAll(transform.position, areaOfInfluence, Vector2.zero, 0, spaceShip);
+
+        if (hit[0].transform.GetComponent<SpaceShipLogic>().active == true)
+        {
+            //BoidsManager.Instance.boids.Add(gameObject);
+            CameraLogic.Instance.focusedShips.Add(gameObject);
+            active = true;
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, areaOfInfluence);
+    }
+
+    private void OnDestroy()
+    {
+        BoidsManager.Instance.boids.Remove(gameObject);
+        CameraLogic.Instance.focusedShips.Remove(gameObject);
+    }
 }

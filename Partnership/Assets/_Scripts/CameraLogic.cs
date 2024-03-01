@@ -5,8 +5,12 @@ using UnityEngine;
 
 public class CameraLogic : MonoBehaviour
 {
+    public static CameraLogic Instance { get; private set; }
+
     public CinemachineVirtualCamera virtualCamera;
     public GameObject mainShip;
+
+    public float minOrtho = 30;
 
     public float zoomSpeed;
     public float minZoomSpeed;
@@ -16,29 +20,41 @@ public class CameraLogic : MonoBehaviour
 
     public float targetOrtho;
 
-    public GameObject[] focusedShips = new GameObject[0];
+    public List<GameObject> focusedShips = new List<GameObject> ();
     public LayerMask shipLayer;
     public Vector2 colliderArea;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
 
+    private void Start()
+    {
+        focusedShips = BoidsManager.Instance.boids;
+    }
     private void Update()
     {
-        FleetCollider();
         FollowFleet();
         CameraZoom();
 
-        virtualCamera.m_Lens.OrthographicSize = Mathf.Clamp(virtualCamera.m_Lens.OrthographicSize, 30, 100);
+        virtualCamera.m_Lens.OrthographicSize = Mathf.Clamp(virtualCamera.m_Lens.OrthographicSize, minOrtho, 100);
+        targetOrtho = Mathf.Clamp(targetOrtho, minOrtho, 100);
 
         if (AverageSpeed() >= minZoomSpeed)
         {
             targetOrtho = AverageSpeed() * 1.75f;
+        }
+        if (AverageSpeed() <= minZoomSpeed)
+        {
+            targetOrtho = minOrtho;
         }
     }
 
     public void FollowFleet()
     {
 
-        if (focusedShips.Length <= 0)
+        if (focusedShips.Count <= 1)
         {
             transform.position = new Vector3(mainShip.transform.position.x, mainShip.transform.position.y, transform.position.z);
         }
@@ -52,17 +68,10 @@ public class CameraLogic : MonoBehaviour
                 totalPos += (Vector2)go.transform.position;
             }
 
-            Vector2 center = totalPos / focusedShips.Length;
+            Vector2 center = totalPos / focusedShips.Count;
 
-
-            if (targetOrtho < speedThreshold)
-            {
-                transform.position = Vector3.Lerp(transform.position, new Vector3(center.x, center.y, transform.position.z), moveDelta * Time.deltaTime);
-            }
-            else
-            {
-                transform.position = Vector3.Lerp(transform.position, new Vector3(center.x, center.y, transform.position.z), moveDelta * 2 * Time.deltaTime);
-            }
+            transform.position = new Vector3(center.x, center.y, transform.position.z);
+            transform.position = new Vector3(mainShip.transform.position.x, mainShip.transform.position.y, transform.position.z);
         }
 
     }
@@ -76,28 +85,19 @@ public class CameraLogic : MonoBehaviour
             totalSpeed += go.GetComponent<SpaceShipLogic>().speed;
         }
 
-        return totalSpeed / focusedShips.Length;
-    }
-
-    public void FleetCollider()
-    {
-        RaycastHit2D[] hit = Physics2D.BoxCastAll(transform.position, colliderArea, 0, Vector3.zero, 0, shipLayer);
-        List<GameObject> sur_ships = new List<GameObject>();
-
-        for (int i = 0; i < hit.Length; i++)
-        {
-            if (hit[i].transform.gameObject != gameObject)
-            {
-                sur_ships.Add(hit[i].transform.gameObject);
-            }
-        }
-
-        focusedShips = sur_ships.ToArray();
+        return totalSpeed / focusedShips.Count;
     }
 
     public void CameraZoom()
     {
-        virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetOrtho, zoomSpeed * Time.deltaTime);
+        if (AverageSpeed() >= minZoomSpeed)
+        {
+            virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetOrtho, zoomSpeed * Time.deltaTime);
+        }
+        if (AverageSpeed() <= minZoomSpeed)
+        {
+            virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetOrtho, Mathf.Pow(zoomSpeed * Time.deltaTime, 3) );
+        }
     }
 
     private void OnDrawGizmos()

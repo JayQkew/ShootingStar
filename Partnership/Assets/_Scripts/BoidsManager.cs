@@ -6,7 +6,7 @@ public class BoidsManager : MonoBehaviour
 {
     public static BoidsManager Instance { get; private set; }
 
-    public GameObject[] boids = new GameObject[0];
+    public List<GameObject> boids = new List<GameObject>();
     public float coherenceForce;
     public float separationForce;
     public float areaOfInfluence;
@@ -16,10 +16,6 @@ public class BoidsManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
-    {
-        boids = GameObject.FindGameObjectsWithTag("ship");
-    }
 
     private void Update()
     {
@@ -28,6 +24,7 @@ public class BoidsManager : MonoBehaviour
 
     private void BoidsLogic()
     {
+
         foreach (var boid in boids)
         {
             boid.GetComponent<SpaceShipLogic>().areaOfInfluence = areaOfInfluence;
