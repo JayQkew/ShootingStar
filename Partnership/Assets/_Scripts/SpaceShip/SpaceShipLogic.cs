@@ -5,10 +5,12 @@ using UnityEngine;
 public class SpaceShipLogic : MonoBehaviour
 {
     public bool active;
+    public GameObject collectVFX;
     public float forceMultiplier;
     public float breakTime;
     public Rigidbody2D rb;
     public float speed;
+    public AudioSource audioSource;
 
     [Header("BOIDS Behavoir")]
     public float areaOfInfluence;
@@ -72,6 +74,8 @@ public class SpaceShipLogic : MonoBehaviour
         {
             //BoidsManager.Instance.boids.Add(gameObject);
             CameraLogic.Instance.focusedShips.Add(gameObject);
+            Instantiate(collectVFX, transform.position, Quaternion.identity);
+            audioSource.Play();
             active = true;
         }
     }
