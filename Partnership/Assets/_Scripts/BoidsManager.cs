@@ -12,6 +12,9 @@ public class BoidsManager : MonoBehaviour
     public float separationForce;
     public float areaOfInfluence;
 
+    private bool move;
+    private bool stop;
+
     public float forceMultiplier;
     public float breakTime;
     private void Awake()
@@ -22,7 +25,13 @@ public class BoidsManager : MonoBehaviour
 
     private void Update()
     {
+        MovementInput();
+    }
+
+    private void FixedUpdate()
+    {
         BoidsLogic();
+        
     }
 
     private void BoidsLogic()
@@ -35,11 +44,11 @@ public class BoidsManager : MonoBehaviour
             Coherence(boid);
             Separation(boid);
 
-            Movement(boid);
+            MovementCalc(boid);
         }
     }
 
-    private void Movement(GameObject boid)
+    private void MovementCalc(GameObject boid)
     {
         Rigidbody2D rb = boid.GetComponent<Rigidbody2D>();
 
@@ -47,16 +56,36 @@ public class BoidsManager : MonoBehaviour
         rb.rotation = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg - 90f;
 
         Vector3 clampedThrust = Vector3.ClampMagnitude(forceDir, 5);
-        if (Input.GetMouseButton(0))
+
+        if (boid.GetComponent<SpaceShipLogic>().move == true)
         {
-            rb.AddForce(clampedThrust * forceMultiplier * Time.fixedDeltaTime, ForceMode2D.Force);
+            rb.AddForce(clampedThrust * forceMultiplier, ForceMode2D.Force);
+            boid.GetComponent<SpaceShipLogic>().move = false;
         }
-        if (Input.GetMouseButton(1))
+        if (boid.GetComponent<SpaceShipLogic>().stop == true)
         {
-            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, breakTime * Time.deltaTime);
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, breakTime* 10 * Time.deltaTime);
+            boid.GetComponent<SpaceShipLogic>().stop = false;
         }
     }
 
+    private void MovementInput()
+    {
+        if ( Input.GetMouseButton(0))
+        {
+            foreach(var boid in boids)
+            {
+                boid.GetComponent<SpaceShipLogic>().move = true;
+            }
+        }
+        if (Input.GetMouseButton(1))
+        {
+            foreach (var boid in boids)
+            {
+                boid.GetComponent<SpaceShipLogic>().stop = true;
+            }
+        }
+    }
 
 
     private void Coherence(GameObject boid)

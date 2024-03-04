@@ -40,7 +40,8 @@ public class PlanetLogic : MonoBehaviour
         GameObject _plant = Instantiate(plant, transform, true);
         _plant.transform.position = pos;
         _plant.transform.Rotate(new Vector3(0, 0, normalZ));
-        float randScale = Random.Range(1f, 2f);
+        float randScale = Random.Range(1f, 3.5f);
+        _plant.GetComponentInChildren<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color * (Color.white * 1.5f);
         _plant.transform.localScale *= randScale;
     }
 

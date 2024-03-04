@@ -17,6 +17,9 @@ public class SpaceShipLogic : MonoBehaviour
     public LayerMask spaceShip;
     public GameObject[] surroundingShips;
 
+    public bool move;
+    public bool stop;
+
     void Update()
     {
         if (active == true)

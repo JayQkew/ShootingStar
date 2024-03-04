@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SpaceManager : MonoBehaviour
@@ -15,6 +16,7 @@ public class SpaceManager : MonoBehaviour
     public LayerMask chunkLayer;
     public Transform world;
 
+    public GameObject[] activeChunks = new GameObject[0];
     public List<GameObject> spaceChunks = new List<GameObject>();
     public Dictionary<Vector2Int, GameObject> cellChunkPairs = new Dictionary<Vector2Int, GameObject>();
 
@@ -25,9 +27,10 @@ public class SpaceManager : MonoBehaviour
 
     private void Update()
     {
+        activeChunks = GameObject.FindGameObjectsWithTag("chunk");
         GetSurroundingCells();
-        //CellCheck();
-        
+        CellCheck();
+
     }
 
     private void GetPlayerCell() => playerCell = (Vector2Int)grid.WorldToCell(mainShip.transform.position);
@@ -51,7 +54,7 @@ public class SpaceManager : MonoBehaviour
 
     private void CellCheck()
     {
-        for (int i = 0; i < surroundingCells.Length - 1; i++)
+        for (int i = 0; i < surroundingCells.Length; i++)
         {
             if (!ChunkChecker(surroundingCells[i])) // this cell doesnt contains a chunk
             {
@@ -60,7 +63,7 @@ public class SpaceManager : MonoBehaviour
                 if (!cellChunkPairs.ContainsKey(surroundingCells[i]))   
                 {
                     //spawn a random chunk 
-                    GameObject newChunk = Instantiate(spaceChunks[Random.Range(0, surroundingCells.Length - 1)], grid.GetCellCenterWorld((Vector3Int)surroundingCells[i]), Quaternion.identity, world);
+                    GameObject newChunk = Instantiate(spaceChunks[Random.Range(0, surroundingCells.Length)], grid.GetCellCenterWorld((Vector3Int)surroundingCells[i]), Quaternion.identity, world);
                     //ADD key-value pair to dictionary
                     cellChunkPairs.Add(surroundingCells[i], newChunk);
                     surroundingChunks[i] = newChunk;
@@ -70,7 +73,8 @@ public class SpaceManager : MonoBehaviour
                 else
                 {
                     //spawn assigned value of the key
-                    GameObject oldChunk = Instantiate(cellChunkPairs[surroundingCells[i]], grid.GetCellCenterWorld((Vector3Int)surroundingCells[i]), Quaternion.identity, world);
+                    GameObject oldChunk = cellChunkPairs[surroundingCells[i]];
+                    oldChunk.SetActive(true);
                     surroundingChunks[i] = oldChunk;
                 }
 
@@ -82,6 +86,13 @@ public class SpaceManager : MonoBehaviour
 
         }
 
+        for(int i = 0;i < activeChunks.Length; i++)
+        {
+            if (!surroundingChunks.Contains(activeChunks[i]))
+            {
+                activeChunks[i].SetActive(false);
+            }
+        }
     }
 
     private bool ChunkChecker(Vector2Int cell)
