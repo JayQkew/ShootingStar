@@ -20,7 +20,7 @@ public class CameraLogic : MonoBehaviour
 
     public float targetOrtho;
 
-    public List<GameObject> focusedShips = new List<GameObject> ();
+    public List<GameObject> focusedShips = new List<GameObject>();
     public LayerMask shipLayer;
     public Vector2 colliderArea;
 
@@ -35,7 +35,7 @@ public class CameraLogic : MonoBehaviour
     }
     private void Update()
     {
-        FollowFleet();
+        FollowShip();
         CameraZoom();
 
         virtualCamera.m_Lens.OrthographicSize = Mathf.Clamp(virtualCamera.m_Lens.OrthographicSize, minOrtho, 100);
@@ -51,30 +51,7 @@ public class CameraLogic : MonoBehaviour
         }
     }
 
-    public void FollowFleet()
-    {
-
-        if (focusedShips.Count <= 1)
-        {
-            transform.position = new Vector3(mainShip.transform.position.x, mainShip.transform.position.y, transform.position.z);
-        }
-        else
-        {
-            Vector2 totalPos = Vector2.zero;
-
-
-            foreach (GameObject go in focusedShips)
-            {
-                totalPos += (Vector2)go.transform.position;
-            }
-
-            Vector2 center = totalPos / focusedShips.Count;
-
-            transform.position = new Vector3(center.x, center.y, transform.position.z);
-            transform.position = new Vector3(mainShip.transform.position.x, mainShip.transform.position.y, transform.position.z);
-        }
-
-    }
+    public void FollowShip() => transform.position = new Vector3(mainShip.transform.position.x, mainShip.transform.position.y, transform.position.z);
 
     public float AverageSpeed()
     {
@@ -96,7 +73,7 @@ public class CameraLogic : MonoBehaviour
         }
         if (AverageSpeed() <= minZoomSpeed)
         {
-            virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetOrtho, Mathf.Pow(zoomSpeed * Time.deltaTime, 3) );
+            virtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(virtualCamera.m_Lens.OrthographicSize, targetOrtho, Mathf.Pow(zoomSpeed * Time.deltaTime, 3));
         }
     }
 

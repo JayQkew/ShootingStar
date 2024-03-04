@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class BoidsManager : MonoBehaviour
     public float separationForce;
     public float areaOfInfluence;
 
+    public float forceMultiplier;
+    public float breakTime;
     private void Awake()
     {
         Instance = this;
@@ -31,8 +34,30 @@ public class BoidsManager : MonoBehaviour
 
             Coherence(boid);
             Separation(boid);
+
+            Movement(boid);
         }
     }
+
+    private void Movement(GameObject boid)
+    {
+        Rigidbody2D rb = boid.GetComponent<Rigidbody2D>();
+
+        Vector3 forceDir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - boid.transform.position;
+        rb.rotation = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg - 90f;
+
+        Vector3 clampedThrust = Vector3.ClampMagnitude(forceDir, 5);
+        if (Input.GetMouseButton(0))
+        {
+            rb.AddForce(clampedThrust * forceMultiplier * Time.fixedDeltaTime, ForceMode2D.Force);
+        }
+        if (Input.GetMouseButton(1))
+        {
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, breakTime * Time.deltaTime);
+        }
+    }
+
+
 
     private void Coherence(GameObject boid)
     {
@@ -55,7 +80,14 @@ public class BoidsManager : MonoBehaviour
 
         Vector2 noramilzedCenterOfMass = Vector2.ClampMagnitude(centerOfMassForce, 1);
 
-        if (centerOfMassForce.magnitude > 0) boid.GetComponent<Rigidbody2D>().AddForce(noramilzedCenterOfMass * coherenceForce, ForceMode2D.Force);
+        if (centerOfMassForce.magnitude > 0 && (noramilzedCenterOfMass * coherenceForce).GetType() == typeof(Vector2))
+        {
+            Vector2 force = noramilzedCenterOfMass * coherenceForce;
+            if (!float.IsNaN(force.x) && !float.IsNaN(force.y))
+            {
+                boid.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Force);
+            }
+        }
         else return;
 
         Debug.DrawLine(boid.transform.position, centerOfMassForce);
@@ -73,6 +105,7 @@ public class BoidsManager : MonoBehaviour
                 {
                     center -= (Vector2)b.transform.position - (Vector2)boid.transform.position;
                 }
+
             }
         }
         else return;
@@ -80,7 +113,14 @@ public class BoidsManager : MonoBehaviour
         Vector2 normailzedCenter = Vector2.ClampMagnitude(center, 1);
 
 
-        if (center.magnitude > 0) boid.GetComponent<Rigidbody2D>().AddForce(normailzedCenter * separationForce, ForceMode2D.Force);
+        if (center.magnitude > 0 && (normailzedCenter * separationForce).GetType() == typeof(Vector2))
+        {
+            Vector2 force = normailzedCenter * separationForce;
+            if (!float.IsNaN(force.x) && !float.IsNaN(force.y))
+            {
+                boid.GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Force);
+            }
+        }
         else return;
 
     }

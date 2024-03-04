@@ -23,29 +23,11 @@ public class SpaceShipLogic : MonoBehaviour
         {
             speed = Vector3.Magnitude(rb.velocity);
 
-            MovementControl();
             SurroudingShips();
         }
         else if (active == false) 
         {
             ShipScanner();
-        }
-    }
-
-    public void MovementControl()
-    {
-        // make the ship look in the direction of the mouse
-        Vector3 forceDir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-        rb.rotation = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg - 90f;
-
-        Vector3 clampedThrust = Vector3.ClampMagnitude(forceDir, 5);
-        if (Input.GetMouseButton(0))
-        {
-            rb.AddForce(clampedThrust * forceMultiplier * Time.fixedDeltaTime, ForceMode2D.Force);
-        }
-        if (Input.GetMouseButton(1))
-        {
-            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, breakTime * Time.fixedDeltaTime);
         }
     }
 
@@ -68,9 +50,9 @@ public class SpaceShipLogic : MonoBehaviour
 
     public void ShipScanner()
     {
-        RaycastHit2D[] hit = Physics2D.CircleCastAll(transform.position, areaOfInfluence, Vector2.zero, 0, spaceShip);
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, areaOfInfluence, Vector2.zero, 0, spaceShip);
 
-        if (hit[0].transform.GetComponent<SpaceShipLogic>().active == true)
+        if (hit.transform.GetComponent<SpaceShipLogic>().active == true)
         {
             //BoidsManager.Instance.boids.Add(gameObject);
             CameraLogic.Instance.focusedShips.Add(gameObject);

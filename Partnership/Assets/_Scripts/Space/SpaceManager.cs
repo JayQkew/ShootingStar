@@ -26,7 +26,7 @@ public class SpaceManager : MonoBehaviour
     private void Update()
     {
         GetSurroundingCells();
-        CellCheck();
+        //CellCheck();
         
     }
 
@@ -51,7 +51,7 @@ public class SpaceManager : MonoBehaviour
 
     private void CellCheck()
     {
-        for (int i = 0; i < surroundingCells.Length; i++)
+        for (int i = 0; i < surroundingCells.Length - 1; i++)
         {
             if (!ChunkChecker(surroundingCells[i])) // this cell doesnt contains a chunk
             {
@@ -60,7 +60,7 @@ public class SpaceManager : MonoBehaviour
                 if (!cellChunkPairs.ContainsKey(surroundingCells[i]))   
                 {
                     //spawn a random chunk 
-                    GameObject newChunk = Instantiate(spaceChunks[Random.Range(0, surroundingCells.Length)], grid.GetCellCenterWorld((Vector3Int)surroundingCells[i]), Quaternion.identity, world);
+                    GameObject newChunk = Instantiate(spaceChunks[Random.Range(0, surroundingCells.Length - 1)], grid.GetCellCenterWorld((Vector3Int)surroundingCells[i]), Quaternion.identity, world);
                     //ADD key-value pair to dictionary
                     cellChunkPairs.Add(surroundingCells[i], newChunk);
                     surroundingChunks[i] = newChunk;
