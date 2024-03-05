@@ -6,6 +6,7 @@ using UnityEngine;
 public class SpaceShipGUI : MonoBehaviour
 {
     [Header("Ship Colour")]
+    public Animator anim;
     public AnimationClip clip;
     public AnimationCurve r_curve;
     public AnimationCurve g_curve;
@@ -34,23 +35,38 @@ public class SpaceShipGUI : MonoBehaviour
 
     private void Start()
     {
+        anim = GetComponent<Animator>();
+        ChangeColours();
+    }
+
+
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            ChangeColours();
+        }
+    }
+
+    public void ChangeColours()
+    {
         switch (AestheticManager.Instance.currentColour)
         {
-            case MainColour.Red:
-                ColourKeys(red);
-                trailRenderer.colorGradient = gradient_red;
-                break;
-            case MainColour.Blue:
-                ColourKeys(blue);
-                trailRenderer.colorGradient = gradient_blue;
-                break;
             case MainColour.Yellow:
-                ColourKeys(yellow);
                 trailRenderer.colorGradient = gradient_yellow;
+                anim.SetInteger("AnimInt", 2);
                 break;
             case MainColour.Green:
-                ColourKeys(green);
                 trailRenderer.colorGradient = gradient_green;
+                anim.SetInteger("AnimInt", 3);
+                break;
+            case MainColour.Red:
+                trailRenderer.colorGradient = gradient_red;
+                anim.SetInteger("AnimInt", 0);
+                break;
+            case MainColour.Blue:
+                trailRenderer.colorGradient = gradient_blue;
+                anim.SetInteger("AnimInt", 1);
                 break;
         }
 
@@ -68,17 +84,8 @@ public class SpaceShipGUI : MonoBehaviour
                 break;
         }
     }
-
-    private void Update()
-    {
-        //ColorKeys(activeColour);
-    }
     public void ColourKeys(Color colour)
     {
-        AnimationClip newClip = new AnimationClip();
-
-        newClip = clip;
-
         float r_col = colour.r;
         float g_col = colour.g;
         float b_col = colour.b;
