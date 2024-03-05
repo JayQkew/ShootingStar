@@ -40,9 +40,10 @@ public class PlanetLogic : MonoBehaviour
         GameObject _plant = Instantiate(plant, transform, true);
         _plant.transform.position = pos;
         _plant.transform.Rotate(new Vector3(0, 0, normalZ));
-        float randScale = Random.Range(1f, 3.5f);
-        _plant.GetComponentInChildren<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color * (Color.white * 1.5f);
-        _plant.transform.localScale *= randScale;
+        _plant.GetComponentInChildren<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color;
+        _plant.transform.localScale *= Random.Range(1, 3.5f);
+
+        // decided with GUI script for plant
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
